@@ -1,0 +1,54 @@
+{
+    "name": "stechstudio/laravel-socialite-auth",
+    "description": "Use socialite as a Laravel auth driver.",
+    "keywords": [
+        "stechstudio",
+        "laravel-socialite-auth"
+    ],
+    "homepage": "https://github.com/stechstudio/laravel-socialite-auth",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Matthew Mueller",
+            "email": "matthew@stechstudio.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "5.7.*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "3.7.*",
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Stechstudio\\LaravelSocialiteAuth\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Stechstudio\\LaravelSocialiteAuth\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Stechstudio\\LaravelSocialiteAuth\\LaravelSocialiteAuthServiceProvider"
+            ],
+            "aliases": {
+                "LaravelSocialiteAuth": "Stechstudio\\LaravelSocialiteAuth\\LaravelSocialiteAuthFacade"
+            }
+        }
+    }
+}
