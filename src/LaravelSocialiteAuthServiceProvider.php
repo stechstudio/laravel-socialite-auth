@@ -6,51 +6,24 @@ use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Config;
 
 class LaravelSocialiteAuthServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
+     * @param \Illuminate\Http\Request $request
      */
-    public function boot()
+    public function boot(Request $request)
     {
-        /*
-         * Optional methods to load your package assets
-         */
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-socialite-auth');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-socialite-auth');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->publishAssetsIfConsole();
 
-
-
-
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('socialite-auth.php'),
-            ], 'config');
-
-
-            // Publishing the views.
-            /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-socialite-auth'),
-            ], 'views');*/
-
-            // Publishing assets.
-            /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/laravel-socialite-auth'),
-            ], 'assets');*/
-
-            // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-socialite-auth'),
-            ], 'lang');*/
-
-            // Registering package commands.
-            // $this->commands([]);
-        }
+        $this->registerSocialiteGuardMacro();
+        $this->registerSocialiteAuthDriver();
+        $this->addGuardToConfig();
     }
 
     /**
@@ -58,7 +31,6 @@ class LaravelSocialiteAuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'socialite-auth');
 
@@ -66,23 +38,56 @@ class LaravelSocialiteAuthServiceProvider extends ServiceProvider
         $this->app->singleton('laravel-socialite-auth', function () {
             return new LaravelSocialiteAuth;
         });
+    }
 
-        SessionGuard::macro('attemptWithSocialite', function($user) {
-           $model = $this->provider->retrieveByCredentials([
-               'email' => $user->email
-           ]);
+    private function publishAssetsIfConsole()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/config.php' => config_path('socialite-auth.php'),
+            ], 'config');
+        }
+    }
 
-           if ($model && SocialiteAuth::allowsLogin($model)) {
-               $this->login($model);
-               return true;
-           }
+    public function registerSocialiteGuardMacro()
+    {
+        SessionGuard::macro('attemptFromSocialite', function(AuthenticatableSocialiteUser $user) {
+            $modelField = 'email';
 
-           return false;
+            if (method_exists($this->provider, 'createModel')) {
+                $new = $this->provider->createModel();
+                if ($new instanceof SocialiteAuthenticatable) {
+                    $modelField = $new->getSocialiteCredentialField();
+                }
+            }
+
+            $user = $this->provider->retrieveByCredentials([
+                $modelField => $user->getSocialiteCredential()
+            ]);
+
+            if ($user && LaravelSocialiteAuthFacade::verifyBeforeLogin($user)) {
+                $this->login($user);
+                return true;
+            }
+
+            return false;
         });
+    }
 
+    public function registerSocialiteAuthDriver()
+    {
         Auth::extend('socialite', function ($app, $name, array $config) {
             return Auth::createSessionDriver($name, $config);
-            //return new SocialiteGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
         });
+    }
+
+    private function addGuardToConfig()
+    {
+        if (!config::has('auth.guards.socialite')) {
+            config::set('auth.guards.socialite', [
+                'driver' => 'socialite',
+                'provider' => 'users'
+            ]);
+        }
     }
 }

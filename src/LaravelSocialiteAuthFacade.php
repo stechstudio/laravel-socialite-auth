@@ -5,7 +5,7 @@ namespace Stechstudio\LaravelSocialiteAuth;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Stechstudio\LaravelSocialiteAuth\Skeleton\SkeletonClass
+ * @see \Stechstudio\LaravelSocialiteAuth\LaravelSocialiteAuth
  */
 class LaravelSocialiteAuthFacade extends Facade
 {

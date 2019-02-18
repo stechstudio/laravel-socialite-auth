@@ -6,8 +6,8 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Laravel\Socialite\Facades\Socialite;
+use Stechstudio\LaravelSocialiteAuth\AuthenticatableSocialiteUser;
 
 class SocialiteController extends Controller
 {
@@ -21,28 +21,28 @@ class SocialiteController extends Controller
     protected $redirectTo = '/admin/proposals';
 
     /**
-     **_ Redirect the user to the OAuth Provider.
-     * _**
-     **_ @return \Illuminate\Http\Response
-     * _**/
+     * Redirect the user to the OAuth Provider.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function redirectToProvider()
     {
         return Socialite::driver(config('socialite-auth.driver'))->redirect();
     }
 
     /**
-     * _ Obtain the user information from provider.  Check if the user already exists in our
-     * _ database by looking up their provider_id in the database.
-     * _ If the user exists, log them in. Otherwise, create a new user then log them in. After that
-     * _ redirect them to the authenticated users homepage.
-     * _
-     * _ @return \Illuminate\Http\Response
+     * Obtain the user information from provider.  Check if the user already exists in our
+     * database by looking up their provider_id in the database.
+     * If the user exists, log them in. Otherwise, create a new user then log them in. After that
+     * redirect them to the authenticated users homepage.
+     *
+     * @return \Illuminate\Http\Response
      */
     public function handleProviderCallback()
     {
         $user = Socialite::driver(config('socialite-auth.driver'))->user();
-
-        if (Auth::guard('socialite')->attemptWithSocialite($user)) {
+        $user = new AuthenticatableSocialiteUser($user, config('socialite-auth.column'));
+        if (Auth::guard('socialite')->attemptFromSocialite($user)) {
             return redirect()->intended();
         }
 
