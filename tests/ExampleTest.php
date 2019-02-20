@@ -1,6 +1,6 @@
 <?php
 
-namespace Stechstudio\LaravelSocialiteAuth\Tests;
+namespace STS\SocialiteAuth\Tests;
 
 use PHPUnit\Framework\TestCase;
 

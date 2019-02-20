@@ -1,13 +1,12 @@
 <?php
 
-namespace Stechstudio\LaravelSocialiteAuth;
+namespace STS\SocialiteAuth\Http\Controllers;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Laravel\Socialite\Facades\Socialite;
-use Stechstudio\LaravelSocialiteAuth\AuthenticatableSocialiteUser;
 
 class SocialiteController extends Controller
 {
@@ -41,8 +40,8 @@ class SocialiteController extends Controller
     public function handleProviderCallback()
     {
         $user = Socialite::driver(config('socialite-auth.driver'))->user();
-        $user = new AuthenticatableSocialiteUser($user, config('socialite-auth.column'));
-        if (Auth::guard('socialite')->attemptFromSocialite($user)) {
+
+        if (Auth::guard('socialite')->attemptFromSocialite($user, config('socialite-auth.field'))) {
             return redirect()->intended();
         }
 

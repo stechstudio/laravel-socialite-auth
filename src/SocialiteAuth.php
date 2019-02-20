@@ -1,11 +1,11 @@
 <?php
 
-namespace Stechstudio\LaravelSocialiteAuth;
+namespace STS\SocialiteAuth;
 
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class LaravelSocialiteAuth
+class SocialiteAuth
 {
     /**
      * @var \Closure
@@ -16,7 +16,6 @@ class LaravelSocialiteAuth
      * Provide Custom logic for verifying a user before login.
      *
      * @param \Closure
-
      */
     public function beforeLogin(Closure $beforeLogin) {
         $this->verifyUser = $beforeLogin;

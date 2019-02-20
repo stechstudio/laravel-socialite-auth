@@ -1,16 +1,14 @@
 <?php
 
-namespace Stechstudio\LaravelSocialiteAuth;
+namespace STS\SocialiteAuth;
 
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 
-class LaravelSocialiteAuthServiceProvider extends ServiceProvider
+class SocialiteAuthServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -18,7 +16,7 @@ class LaravelSocialiteAuthServiceProvider extends ServiceProvider
      */
     public function boot(Request $request)
     {
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadRoutesFrom(__DIR__ .'/../routes/web.php');
         $this->publishAssetsIfConsole();
 
         $this->registerSocialiteGuardMacro();
@@ -35,8 +33,8 @@ class LaravelSocialiteAuthServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'socialite-auth');
 
         // Register the main class to use with the facade
-        $this->app->singleton('laravel-socialite-auth', function () {
-            return new LaravelSocialiteAuth;
+        $this->app->singleton('socialite-auth', function () {
+            return new SocialiteAuth();
         });
     }
 
@@ -51,27 +49,7 @@ class LaravelSocialiteAuthServiceProvider extends ServiceProvider
 
     public function registerSocialiteGuardMacro()
     {
-        SessionGuard::macro('attemptFromSocialite', function(AuthenticatableSocialiteUser $user) {
-            $modelField = 'email';
-
-            if (method_exists($this->provider, 'createModel')) {
-                $new = $this->provider->createModel();
-                if ($new instanceof SocialiteAuthenticatable) {
-                    $modelField = $new->getSocialiteCredentialField();
-                }
-            }
-
-            $user = $this->provider->retrieveByCredentials([
-                $modelField => $user->getSocialiteCredential()
-            ]);
-
-            if ($user && LaravelSocialiteAuthFacade::verifyBeforeLogin($user)) {
-                $this->login($user);
-                return true;
-            }
-
-            return false;
-        });
+        SessionGuard::mixin(new GuardHelpers());
     }
 
     public function registerSocialiteAuthDriver()
@@ -83,8 +61,8 @@ class LaravelSocialiteAuthServiceProvider extends ServiceProvider
 
     private function addGuardToConfig()
     {
-        if (!config::has('auth.guards.socialite')) {
-            config::set('auth.guards.socialite', [
+        if (!Config::has('auth.guards.socialite')) {
+            Config::set('auth.guards.socialite', [
                 'driver' => 'socialite',
                 'provider' => 'users'
             ]);

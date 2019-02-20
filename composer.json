@@ -26,12 +26,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Stechstudio\\LaravelSocialiteAuth\\": "src"
-        }
+            "STS\\SocialiteAuth\\": "src"
+            }
     },
     "autoload-dev": {
         "psr-4": {
-            "Stechstudio\\LaravelSocialiteAuth\\Tests\\": "tests"
+            "STS\\SocialiteAuth\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -45,10 +45,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Stechstudio\\LaravelSocialiteAuth\\LaravelSocialiteAuthServiceProvider"
+                "STS\\SocialiteAuth\\SocialiteAuthServiceProvider"
             ],
             "aliases": {
-                "LaravelSocialiteAuth": "Stechstudio\\LaravelSocialiteAuth\\LaravelSocialiteAuthFacade"
+                "SocialiteAuth": "STS\\SocialiteAuth\\Facades\\SocialiteAuth"
             }
         }
     }
