@@ -2,23 +2,8 @@
 
 namespace STS\SocialiteAuth\Tests;
 
-use Orchestra\Testbench\TestCase;
-use STS\SocialiteAuth\SocialiteAuthServiceProvider;
-
-class CustomConfigTest extends TestCase
+class CustomConfigTest extends BaseTest
 {
-    protected function getPackageAliases($app)
-    {
-        return [
-            'SocialiteAuth' => \STS\SocialiteAuth\Facades\SocialiteAuth::class
-        ];
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [SocialiteAuthServiceProvider::class];
-    }
-
     /**
      * Define environment setup.
      *

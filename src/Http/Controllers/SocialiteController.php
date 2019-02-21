@@ -13,13 +13,6 @@ class SocialiteController extends Controller
     use AuthenticatesUsers, ValidatesRequests;
 
     /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/admin/proposals';
-
-    /**
      * Redirect the user to the OAuth Provider.
      *
      * @return \Illuminate\Http\Response

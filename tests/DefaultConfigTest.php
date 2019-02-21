@@ -2,23 +2,8 @@
 
 namespace STS\SocialiteAuth\Tests;
 
-use Orchestra\Testbench\TestCase;
-use STS\SocialiteAuth\SocialiteAuthServiceProvider;
-
-class DefaultConfigTest extends TestCase
+class DefaultConfigTest extends BaseTest
 {
-    protected function getPackageAliases($app)
-    {
-        return [
-            'SocialiteAuth' => \STS\SocialiteAuth\Facades\SocialiteAuth::class
-        ];
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [SocialiteAuthServiceProvider::class];
-    }
-
     /** @test */
     public function auth_config_has_socialite_guard()
     {

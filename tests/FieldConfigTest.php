@@ -2,28 +2,14 @@
 
 namespace STS\SocialiteAuth\Tests;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Two\User as SocialiteUser;
-use STS\SocialiteAuth\SocialiteAuthServiceProvider;
 
-class FieldConfigTest extends TestCase
+class FieldConfigTest extends BaseTest
 {
     private $existingSocialiteUser = null;
-
-    protected function getPackageAliases($app)
-    {
-        return [
-            'SocialiteAuth' => \STS\SocialiteAuth\Facades\SocialiteAuth::class
-        ];
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [SocialiteAuthServiceProvider::class];
-    }
 
     /**
      * Define environment setup.
