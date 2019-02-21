@@ -19,7 +19,7 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ .'/../routes/web.php');
         $this->publishAssetsIfConsole();
 
-        $this->registerSocialiteGuardMacro();
+        $this->registerSocialiteGuardMixin();
         $this->registerSocialiteAuthDriver();
         $this->addGuardToConfig();
     }
@@ -38,7 +38,7 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         });
     }
 
-    private function publishAssetsIfConsole()
+    protected function publishAssetsIfConsole()
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -47,19 +47,19 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         }
     }
 
-    public function registerSocialiteGuardMacro()
+    protected function registerSocialiteGuardMixin()
     {
         SessionGuard::mixin(new GuardHelpers());
     }
 
-    public function registerSocialiteAuthDriver()
+    protected function registerSocialiteAuthDriver()
     {
         Auth::extend('socialite', function ($app, $name, array $config) {
             return Auth::createSessionDriver($name, $config);
         });
     }
 
-    private function addGuardToConfig()
+    protected function addGuardToConfig()
     {
         if (!Config::has('auth.guards.socialite')) {
             Config::set('auth.guards.socialite', [

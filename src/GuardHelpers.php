@@ -12,12 +12,18 @@ class GuardHelpers
     protected function attemptFromSocialite()
     {
         return function(User $user, $socialiteField) {
+
             $modelSocialiteField = $this->resolveSocialiteIdentifierName();
             $userModel = $this->provider->retrieveByCredentials([
                 $modelSocialiteField => $user[$socialiteField]
             ]);
 
-            return $this->shouldLogin($userModel) ? $this->login($userModel) : false;
+            if ($this->shouldLogin($userModel)) {
+                $this->login($userModel);
+                return true;
+            }
+
+            return false;
         };
     }
 
@@ -38,7 +44,7 @@ class GuardHelpers
 
     protected function shouldLogin()
     {
-        return function(Authenticatable $user) {
+        return function(Authenticatable $user = null) {
             return $user && SocialiteAuth::verifyBeforeLogin($user);
         };
     }
