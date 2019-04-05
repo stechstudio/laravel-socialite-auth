@@ -22,6 +22,7 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         $this->registerSocialiteGuardMixin();
         $this->registerSocialiteAuthDriver();
         $this->addGuardToConfig();
+        $this->configureRedirect();
     }
 
     /**
@@ -66,6 +67,18 @@ class SocialiteAuthServiceProvider extends ServiceProvider
                 'driver' => 'socialite',
                 'provider' => 'users'
             ]);
+        }
+    }
+
+    /**
+     * If a redirect URL hasn't been configured, we deduce from the current request
+     */
+    protected function configureRedirect()
+    {
+        $providerName = config('socialite-auth.driver');
+
+        if(!config("services.$providerName.redirect")) {
+            config(["services.$providerName.redirect" => $this->app['request']->root() . "/socialite-auth/callback"]);
         }
     }
 }
