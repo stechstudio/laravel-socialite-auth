@@ -84,7 +84,7 @@ class BeforeLoginTest extends BaseTest
     /** @test */
     public function existing_user_failed_closure_login_fails()
     {
-        SocialiteAuth::beforeLogin(function($existingSocialiteUser) {
+        SocialiteAuth::beforeLogin(function(User $user) {
            return false;
         });
 
@@ -96,7 +96,7 @@ class BeforeLoginTest extends BaseTest
     /** @test */
     public function missing_user_failed_closure_login_fails()
     {
-        SocialiteAuth::beforeLogin(function($missingSocialiteUser) {
+        SocialiteAuth::beforeLogin(function($user) {
             return false;
         });
 
@@ -108,7 +108,7 @@ class BeforeLoginTest extends BaseTest
     /** @test */
     public function existing_user_passed_closure_login_succeeds()
     {
-        SocialiteAuth::beforeLogin(function($existingSocialiteUser) {
+        SocialiteAuth::beforeLogin(function(User $user) {
             return true;
         });
 
@@ -120,11 +120,27 @@ class BeforeLoginTest extends BaseTest
     /** @test */
     public function missing_user_passed_closure_login_fails()
     {
-        SocialiteAuth::beforeLogin(function($missingSocialiteUser) {
+        SocialiteAuth::beforeLogin(function(User $user) {
             return true;
         });
 
         $this->assertFalse(
+            Auth::guard('socialite')->attemptFromSocialite($this->missingSocialiteUser, config('socialite-auth.field'))
+        );
+    }
+
+    /** @test */
+    public function missing_user_handled_callback_login_succeeds()
+    {
+        SocialiteAuth::newUser(function(SocialiteUser $socialiteUser) {
+            // New user is registering for our app, yay
+            return new User([
+                'name' => $socialiteUser->user['name'],
+                'email' => $socialiteUser->user['email']
+            ]);
+        });
+
+        $this->assertTrue(
             Auth::guard('socialite')->attemptFromSocialite($this->missingSocialiteUser, config('socialite-auth.field'))
         );
     }

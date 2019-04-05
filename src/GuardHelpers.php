@@ -14,9 +14,16 @@ class GuardHelpers
         return function(User $user, $socialiteField) {
 
             $modelSocialiteField = $this->resolveSocialiteIdentifierName();
+
+            // First try to find a match
             $userModel = $this->provider->retrieveByCredentials([
                 $modelSocialiteField => $user[$socialiteField]
             ]);
+
+            // No match? See if we have a custom handler for new users
+            if(!$userModel) {
+                $userModel = SocialiteAuth::handleNewUser($user);
+            }
 
             if ($this->shouldLogin($userModel)) {
                 $this->login($userModel);

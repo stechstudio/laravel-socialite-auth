@@ -13,24 +13,54 @@ class SocialiteAuth
     private $verifyUser = null;
 
     /**
-     * Provide Custom logic for verifying a user before login.
+     * @var \Closure
+     */
+    private $handleNewUser = null;
+
+    /**
+     * Provide custom logic for verifying a user before login.
      *
      * @param \Closure
      */
-    public function beforeLogin(Closure $beforeLogin) {
+    public function beforeLogin( Closure $beforeLogin )
+    {
         $this->verifyUser = $beforeLogin;
+    }
+
+    /**
+     * Provide custom handler for setting up a new user.
+     *
+     * @param Closure $handleNewUser
+     */
+    public function newUser( Closure $handleNewUser )
+    {
+        $this->handleNewUser = $handleNewUser;
     }
 
     /**
      * Verify that the user meets login requirements
      * according to the custom logic provided.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable
+     * @param Authenticatable
+     *
      * @return bool
      */
-    public function verifyBeforeLogin(Authenticatable $user): bool
+    public function verifyBeforeLogin( Authenticatable $user ): bool
     {
-        if (is_null($this->verifyUser)) { return true; }
-        return call_user_func($this->verifyUser, $user);
+        return $this->verifyUser
+            ? call_user_func($this->verifyUser, $user)
+            : true;
+    }
+
+    /**
+     * @param $user
+     *
+     * @return bool|Authenticatable
+     */
+    public function handleNewUser( $user )
+    {
+        return $this->handleNewUser
+            ? call_user_func($this->handleNewUser, $user)
+            : null;
     }
 }
