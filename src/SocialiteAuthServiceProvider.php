@@ -19,14 +19,15 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ .'/../routes/web.php');
         $this->publishAssetsIfConsole();
 
-        $this->registerSocialiteGuardMixin();
-        $this->registerSocialiteAuthDriver();
-        $this->addGuardToConfig();
-        $this->configureRedirect();
-
         if(config('socialite-auth.match') == false) {
             config(['socialite-auth.provider' => 'null']);
         };
+
+        $this->registerSocialiteGuardMixin();
+        $this->registerSocialiteAuthDriver();
+        $this->registerNullUserProvider();
+        $this->addGuardToConfig();
+        $this->configureRedirect();
     }
 
     /**
@@ -74,11 +75,13 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         }
     }
 
-    protected function addNullUserProvider()
+    protected function registerNullUserProvider()
     {
         Auth::provider('null', function($app, $config) {
             return new NullUserProvider();
         });
+
+        Config::set('auth.providers.null', ['driver' => 'null']);
     }
 
     /**
