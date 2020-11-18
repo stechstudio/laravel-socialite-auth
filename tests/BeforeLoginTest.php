@@ -22,6 +22,7 @@ class BeforeLoginTest extends BaseTest
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('auth.providers.users.model', User::class);
+        $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
             'driver'   => 'sqlite',
             'database' => ':memory:',

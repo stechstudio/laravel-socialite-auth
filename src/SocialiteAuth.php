@@ -4,25 +4,36 @@ namespace STS\SocialiteAuth;
 
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Laravel\Socialite\Contracts\User;
 
 class SocialiteAuth
 {
     /**
-     * @var \Closure
+     * @var array
      */
-    private $verifyUser = null;
+    protected $config;
 
     /**
      * @var \Closure
      */
-    private $handleNewUser = null;
+    protected $verifyUser = null;
+
+    /**
+     * @var \Closure
+     */
+    protected $handleNewUser = null;
+
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
 
     /**
      * Provide custom logic for verifying a user before login.
      *
      * @param \Closure
      */
-    public function beforeLogin( Closure $beforeLogin )
+    public function beforeLogin(Closure $beforeLogin)
     {
         $this->verifyUser = $beforeLogin;
     }
@@ -32,7 +43,7 @@ class SocialiteAuth
      *
      * @param Closure $handleNewUser
      */
-    public function newUser( Closure $handleNewUser )
+    public function newUser(Closure $handleNewUser)
     {
         $this->handleNewUser = $handleNewUser;
     }
@@ -45,7 +56,7 @@ class SocialiteAuth
      *
      * @return bool
      */
-    public function verifyBeforeLogin( Authenticatable $user ): bool
+    public function verifyBeforeLogin(Authenticatable $user): bool
     {
         return $this->verifyUser
             ? call_user_func($this->verifyUser, $user)
@@ -57,10 +68,17 @@ class SocialiteAuth
      *
      * @return bool|Authenticatable
      */
-    public function handleNewUser( $user )
+    public function handleNewUser(User $user)
     {
-        return $this->handleNewUser
-            ? call_user_func($this->handleNewUser, $user)
-            : null;
+        if ($this->handleNewUser) {
+            return call_user_func($this->handleNewUser, $user);
+        }
+
+        if ($this->config['match'] == false) {
+            $user = new Identity($user);
+            session()->put('socialite-auth.' . $user->getAuthIdentifier(), $user);
+
+            return $user;
+        }
     }
 }

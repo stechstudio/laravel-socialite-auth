@@ -23,6 +23,10 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         $this->registerSocialiteAuthDriver();
         $this->addGuardToConfig();
         $this->configureRedirect();
+
+        if(config('socialite-auth.match') == false) {
+            config(['socialite-auth.provider' => 'null']);
+        };
     }
 
     /**
@@ -35,7 +39,7 @@ class SocialiteAuthServiceProvider extends ServiceProvider
 
         // Register the main class to use with the facade
         $this->app->singleton('socialite-auth', function () {
-            return new SocialiteAuth();
+            return new SocialiteAuth(config('socialite-auth'));
         });
     }
 
@@ -65,9 +69,16 @@ class SocialiteAuthServiceProvider extends ServiceProvider
         if (!Config::has('auth.guards.socialite')) {
             Config::set('auth.guards.socialite', [
                 'driver' => 'socialite',
-                'provider' => 'users'
+                'provider' => config('socialite-auth.provider')
             ]);
         }
+    }
+
+    protected function addNullUserProvider()
+    {
+        Auth::provider('null', function($app, $config) {
+            return new NullUserProvider();
+        });
     }
 
     /**
