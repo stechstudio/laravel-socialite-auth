@@ -14,7 +14,9 @@ class NullUserProvider implements UserProvider
 
     public function retrieveById($identifier)
     {
-        return session()->get(SocialiteAuth::sessionKeyFor($identifier));
+        return Identity::restore(
+            session()->get(SocialiteAuth::sessionKeyFor($identifier))
+        );
     }
 
     public function retrieveByToken($identifier, $token)

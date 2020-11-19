@@ -2,6 +2,7 @@
 
 namespace STS\SocialiteAuth\Http\Controllers;
 
+use STS\SocialiteAuth\Facades\SocialiteAuth;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -12,7 +13,7 @@ class SocialiteController
      */
     public function redirectToProvider()
     {
-        return Socialite::driver(config('socialite-auth.driver'))->redirect();
+        return SocialiteAuth::getDriver()->redirect();
     }
 
     /**

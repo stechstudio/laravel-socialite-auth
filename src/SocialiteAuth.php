@@ -5,6 +5,7 @@ namespace STS\SocialiteAuth;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Laravel\Socialite\Contracts\User;
+use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteAuth
 {
@@ -12,6 +13,11 @@ class SocialiteAuth
      * @var array
      */
     protected $config;
+
+    /**
+     * @var \Closure
+     */
+    protected $prepareDriver = null;
 
     /**
      * @var \Closure
@@ -26,6 +32,22 @@ class SocialiteAuth
     public function __construct(array $config)
     {
         $this->config = $config;
+    }
+
+    public function getDriver()
+    {
+        $driver = Socialite::driver($this->config['driver']);
+
+        if($this->prepareDriver) {
+            call_user_func($this->prepareDriver, $driver);
+        }
+
+        return $driver;
+    }
+
+    public function prepareDriver(Closure $prepareDriver)
+    {
+        $this->prepareDriver = $prepareDriver;
     }
 
     /**
@@ -75,8 +97,8 @@ class SocialiteAuth
         }
 
         if ($this->config['match'] == false) {
-            $user = new Identity($user);
-            session()->put($this->sessionKeyFor($user->getAuthIdentifier()), $user);
+            $user = Identity::fromSocialite($user);
+            session()->put($this->sessionKeyFor($user->getAuthIdentifier()), $user->toArray());
 
             return $user;
         }

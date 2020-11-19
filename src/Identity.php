@@ -3,22 +3,35 @@
 namespace STS\SocialiteAuth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Support\Arrayable;
 use Laravel\Socialite\Contracts\User;
 
-class Identity implements Authenticatable
+class Identity implements Authenticatable, Arrayable
 {
-    public $socialite;
-
     public $name;
     public $email;
     public $avatar;
 
-    public function __construct(User $user)
+    public static function fromSocialite(User $user)
     {
-        $this->socialite = $user;
-        $this->name = $user->getName();
-        $this->email = $user->getEmail();
-        $this->avatar = $user->getAvatar();
+        $instance = new static;
+
+        $instance->name = $user->getName();
+        $instance->email = $user->getEmail();
+        $instance->avatar = $user->getAvatar();
+
+        return $instance;
+    }
+
+    public static function restore(array $details)
+    {
+        $instance = new static;
+
+        $instance->name = $details['name'];
+        $instance->email = $details['email'];
+        $instance->avatar = $details['avatar'];
+
+        return $instance;
     }
 
     public function getAuthIdentifier()
@@ -45,5 +58,14 @@ class Identity implements Authenticatable
 
     public function setRememberToken($value)
     {
+    }
+
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+            'email' => $this->email,
+            'avatar' => $this->avatar
+        ];
     }
 }
