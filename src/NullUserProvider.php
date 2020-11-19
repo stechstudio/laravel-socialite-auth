@@ -4,6 +4,7 @@ namespace STS\SocialiteAuth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use STS\SocialiteAuth\Facades\SocialiteAuth;
 
 class NullUserProvider implements UserProvider
 {
@@ -13,7 +14,7 @@ class NullUserProvider implements UserProvider
 
     public function retrieveById($identifier)
     {
-        return session()->get('socialite-auth.' . $identifier);
+        return session()->get(SocialiteAuth::sessionKeyFor($identifier));
     }
 
     public function retrieveByToken($identifier, $token)

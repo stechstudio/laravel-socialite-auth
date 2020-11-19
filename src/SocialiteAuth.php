@@ -76,9 +76,14 @@ class SocialiteAuth
 
         if ($this->config['match'] == false) {
             $user = new Identity($user);
-            session()->put('socialite-auth.' . $user->getAuthIdentifier(), $user);
+            session()->put($this->sessionKeyFor($user->getAuthIdentifier()), $user);
 
             return $user;
         }
+    }
+
+    public function sessionKeyFor($identifier)
+    {
+        return 'socialite-auth.' . str_replace('.','-',$identifier);
     }
 }
