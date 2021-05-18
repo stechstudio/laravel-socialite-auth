@@ -25,7 +25,7 @@ class GuardHelpers
                 $userModel = SocialiteAuth::handleNewUser($user);
             }
 
-            if ($this->shouldLogin($userModel)) {
+            if ($userModel && SocialiteAuth::verifyBeforeLogin($userModel)) {
                 $this->login($userModel);
                 return true;
             }
@@ -46,13 +46,6 @@ class GuardHelpers
             }
 
             return $modelField;
-        };
-    }
-
-    protected function shouldLogin()
-    {
-        return function(Authenticatable $user = null) {
-            return $user && SocialiteAuth::verifyBeforeLogin($user);
         };
     }
 }
